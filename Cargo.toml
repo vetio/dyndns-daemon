@@ -1,5 +1,5 @@
 [package]
-name = "rustydns"
+name = "dyndns-daemon"
 version = "0.1.0"
 authors = ["Simon Roosen <simon@firepulse.de>"]
 
