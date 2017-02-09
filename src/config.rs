@@ -55,8 +55,8 @@ impl Config {
     pub fn new() -> Result<Config> {
         use envy::from_env;
 
-        let raw_config = from_env::<RawConfig>()
-            .chain_err(|| "Failed to load enviroment config")?;
+        let raw_config: RawConfig = from_env()
+            .chain_err(|| "Failed to load environment config")?;
         let address = raw_config.smtp_addr()?;
 
         Ok(Config {
