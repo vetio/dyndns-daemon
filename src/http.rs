@@ -6,6 +6,7 @@ use slog::Logger;
 use iron::{Handler, Request, IronResult, IronError, Response};
 
 use dns::DnsService;
+use config;
 
 struct HttpHandler<Service> {
     logger: Arc<Logger>,
@@ -55,7 +56,7 @@ where Service: DnsService + Send + Sync + 'static {
     }
 }
 
-pub fn run_server<Service>(logger: &Logger, service: Service) -> Result<()>
+pub fn run_server<Service>(logger: &Logger, service: Service, config: &config::Config) -> Result<()>
     where Service: DnsService + Send + Sync + 'static {
     use iron::Iron;
 
@@ -63,7 +64,7 @@ pub fn run_server<Service>(logger: &Logger, service: Service) -> Result<()>
     let handler = HttpHandler::new(service, logger);
 
     Iron::new(handler)
-        .http("127.0.0.1:3000")
+        .http(&config.server_addr)
         .chain_err(|| "Error during execution of http server")?;
     Ok(())
 }

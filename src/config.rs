@@ -12,6 +12,7 @@ struct RawConfig {
     pgp_key: String,
     domain: String,
     hetzner_user: String,
+    server_addr: String,
 }
 
 impl RawConfig {
@@ -49,6 +50,7 @@ pub struct Config {
     pub pgp_key: String,
     pub domain: String,
     pub hetzner_user: String,
+    pub server_addr: String,
 }
 
 impl Config {
@@ -68,6 +70,7 @@ impl Config {
             pgp_key: raw_config.pgp_key,
             domain: raw_config.domain,
             hetzner_user: raw_config.hetzner_user,
+            server_addr: raw_config.server_addr,
         })
     }
 }

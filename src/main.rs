@@ -74,7 +74,7 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
         signed_message_builder
     );
 
-    run_server(root_logger, dns_service)
+    run_server(root_logger, dns_service, &config)
         .chain_err(|| "Error running server")
 }
 
