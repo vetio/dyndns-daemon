@@ -13,6 +13,8 @@ struct RawConfig {
     domain: String,
     hetzner_user: String,
     server_addr: String,
+    http_auth_user: String,
+    http_auth_password: String,
 }
 
 impl RawConfig {
@@ -51,6 +53,8 @@ pub struct Config {
     pub domain: String,
     pub hetzner_user: String,
     pub server_addr: String,
+    pub http_auth_user: String,
+    pub http_auth_password: String,
 }
 
 impl Config {
@@ -71,6 +75,8 @@ impl Config {
             domain: raw_config.domain,
             hetzner_user: raw_config.hetzner_user,
             server_addr: raw_config.server_addr,
+            http_auth_user: raw_config.http_auth_user,
+            http_auth_password: raw_config.http_auth_password,
         })
     }
 }
