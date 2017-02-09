@@ -98,8 +98,8 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
         text.push_str("        7200); Minimum\n");
         text.push_str("@ IN NS ns1.first-ns.de.\n");
         text.push_str("@ IN NS ns.second-ns.de.\n");
-        text.push_str(&format!(" @ IN A {}\n", addr));
-        text.push_str(" / end\n");
+        text.push_str(&format!("@ IN A {}\n", addr));
+        text.push_str("/end\n");
 
         self.signed_message_builder.sign(&text)
             .chain_err(|| "Error signing email")
@@ -108,7 +108,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
 impl<S: SignedMessageBuilder> DnsService for HetznerClient<S> {
     fn update(&self, addr: &Ipv4Addr) -> Result<()> {
-        info! ( self.logger, "called with: {}", addr);
+        info!(self.logger, "called with: {}", addr);
 
         let mail_text = self.build_mail_text(addr)
             .chain_err(|| "Error building email text")?;
