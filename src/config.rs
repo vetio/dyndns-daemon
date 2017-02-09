@@ -15,6 +15,7 @@ struct RawConfig {
     server_addr: String,
     http_auth_user: String,
     http_auth_password: String,
+    ip_header: String,
 }
 
 impl RawConfig {
@@ -55,6 +56,7 @@ pub struct Config {
     pub server_addr: String,
     pub http_auth_user: String,
     pub http_auth_password: String,
+    pub ip_header: String,
 }
 
 impl Config {
@@ -77,6 +79,7 @@ impl Config {
             server_addr: raw_config.server_addr,
             http_auth_user: raw_config.http_auth_user,
             http_auth_password: raw_config.http_auth_password,
+            ip_header: raw_config.ip_header,
         })
     }
 }
