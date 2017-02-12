@@ -81,7 +81,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
         let mut text = String::new();
         text.push_str(&format!("user: {}\n", self.hetzner_user));
         text.push_str("job: ns\n");
-        text.push_str("task: update\n");
+        text.push_str("task: upd\n");
         text.push_str(&format!("domain: {}\n", self.domain));
         text.push_str("primary: yours\n");
         text.push_str("zonefile: /begin\n");
@@ -90,6 +90,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
         let now: DateTime<UTC> = UTC::now();
 
+        text.push_str("$TTL 86400\n");
         text.push_str("@ IN SOA ns1.first-ns.de. postmaster.robot.first-ns.de. (\n");
         text.push_str(&format!("        {}; Serial\n", now.timestamp()));
         text.push_str("        86400; Refresh\n");
