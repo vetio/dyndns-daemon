@@ -73,9 +73,15 @@ where Service: DnsService + Send + Sync + 'static {
 
         match r.headers.get_raw(&self.addr_header) {
             Some(values) => {
-                if let Err(e) = String::from_utf8(values[0].clone())
-                    .chain_err(|| "Error reading header as utf-8")
-                    .and_then(|s| Ipv4Addr::from_str(&s).chain_err(|| "Error interpreting address as ipv4"))
+                if let Err(e) = values.first().ok_or_else(|| "No values for ip header".into())
+                    .and_then(
+                        |val| String::from_utf8(val.clone())
+                            .chain_err(|| "Error reading header as utf-8")
+                    )
+                    .and_then(
+                        |s| Ipv4Addr::from_str(&s)
+                            .chain_err(|| "Error interpreting address as ipv4")
+                    )
                     .and_then(|ip| self.service.update(&ip)) {
                     log_error(&self.logger, &e);
                     return Err(IronError::new(
