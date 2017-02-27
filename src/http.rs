@@ -41,7 +41,13 @@ impl<Service: DnsService> HttpHandler<Service> {
 
         match r.headers.get::<headers::Authorization<headers::Basic>>() {
             Some(ref scheme) => {
-                if scheme.username != self.username || scheme.password.as_ref() != Some(&self.password) {
+                let password = match scheme.password {
+                    Some(ref p) => p,
+                    None => return Some(self.generate_auth_error()),
+                };
+
+                if !compare_secure(&scheme.username, &self.username)
+                    || !compare_secure(password, &self.password) {
                     Some(self.generate_auth_error())
                 } else {
                     None
@@ -50,6 +56,12 @@ impl<Service: DnsService> HttpHandler<Service> {
             None => Some(self.generate_auth_error()),
         }
     }
+}
+
+#[inline(never)]
+fn compare_secure(s1: &str, s2: &str) -> bool {
+    use consistenttime::ct_u8_slice_eq;
+    ct_u8_slice_eq(s1.as_bytes(), s2.as_bytes())
 }
 
 impl<Service> Handler for HttpHandler<Service>

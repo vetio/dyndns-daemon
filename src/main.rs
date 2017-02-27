@@ -34,6 +34,8 @@ extern crate dotenv;
 
 extern crate itertools;
 
+extern crate consistenttime;
+
 #[cfg(test)]
 extern crate quickcheck;
 
