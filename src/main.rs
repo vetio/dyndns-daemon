@@ -1,4 +1,5 @@
 #![cfg_attr(test, feature(plugin))]
+#![cfg_attr(test, plugin(quickcheck_macros))]
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 
@@ -32,6 +33,9 @@ extern crate slog_term;
 extern crate dotenv;
 
 extern crate itertools;
+
+#[cfg(test)]
+extern crate quickcheck;
 
 mod errors;
 mod openpgp;
