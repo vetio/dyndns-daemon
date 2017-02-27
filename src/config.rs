@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 use errors::*;
+use template::Template;
 
 #[derive(Deserialize, Debug)]
 struct RawConfig {
@@ -16,6 +17,7 @@ struct RawConfig {
     http_auth_user: String,
     http_auth_password: String,
     ip_header: String,
+    template: String,
 }
 
 impl RawConfig {
@@ -41,6 +43,19 @@ impl RawConfig {
 
         Ok(address)
     }
+
+    fn get_template(&self) -> Result<Template> {
+        use std::fs;
+        use std::io::Read;
+
+        let mut file = fs::File::open(&self.template)
+            .chain_err(|| "Error opening template")?;
+        let mut buffer = String::new();
+        file.read_to_string(&mut buffer)
+            .chain_err(|| "Error reading template to String")?;
+
+        Ok(Template::from_str(&buffer))
+    }
 }
 
 #[derive(Debug)]
@@ -57,6 +72,7 @@ pub struct Config {
     pub http_auth_user: String,
     pub http_auth_password: String,
     pub ip_header: String,
+    pub template: Template,
 }
 
 impl Config {
@@ -65,7 +81,10 @@ impl Config {
 
         let raw_config: RawConfig = from_env()
             .chain_err(|| "Failed to load environment config")?;
-        let address = raw_config.smtp_addr()?;
+        let address = raw_config.smtp_addr()
+            .chain_err(|| "Failed to resolve SMTP addres")?;
+        let template = raw_config.get_template()
+            .chain_err(|| "Error evaluating template")?;
 
         Ok(Config {
             from_addr: raw_config.from_addr,
@@ -80,6 +99,7 @@ impl Config {
             http_auth_user: raw_config.http_auth_user,
             http_auth_password: raw_config.http_auth_password,
             ip_header: raw_config.ip_header,
+            template: template,
         })
     }
 }

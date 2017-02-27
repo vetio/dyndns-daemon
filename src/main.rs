@@ -24,17 +24,21 @@ extern crate iron;
 
 extern crate envy;
 
+
 #[macro_use]
 extern crate slog;
 extern crate slog_term;
 
 extern crate dotenv;
 
+extern crate itertools;
+
 mod errors;
 mod openpgp;
 mod http;
 mod dns;
 mod config;
+mod template;
 
 use errors::*;
 

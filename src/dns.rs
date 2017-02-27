@@ -4,6 +4,7 @@ use slog::Logger;
 use errors::*;
 use openpgp::SignedMessageBuilder;
 use config::Config;
+use template::Template;
 
 pub trait DnsService {
     fn update(&self, addr: &Ipv4Addr) -> Result<()>;
@@ -19,6 +20,7 @@ pub struct HetznerClient<S> {
     password: String,
     hetzner_user: String,
     domain: String,
+    template: Template,
 }
 
 impl<S: SignedMessageBuilder> HetznerClient<S> {
@@ -45,6 +47,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             hetzner_user: config.hetzner_user.clone(),
             domain: config.domain.clone(),
             signed_message_builder: signed_message_builder,
+            template: config.template.clone(),
         }
     }
 
@@ -90,16 +93,10 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
         let now: DateTime<UTC> = UTC::now();
 
-        text.push_str("$TTL 86400\n");
-        text.push_str("@ IN SOA ns1.first-ns.de. postmaster.robot.first-ns.de. (\n");
-        text.push_str(&format!("        {}; Serial\n", now.timestamp()));
-        text.push_str("        86400; Refresh\n");
-        text.push_str("        7200; Retry\n");
-        text.push_str("        604800; Expire\n");
-        text.push_str("        7200); Minimum\n");
-        text.push_str("@ IN NS ns1.first-ns.de.\n");
-        text.push_str("@ IN NS ns.second-ns.de.\n");
-        text.push_str(&format!("@ IN A {}\n", addr));
+        let zonefile = self.template.render(addr, now)
+            .chain_err(|| "Error rendering zonefile")?;
+        text += &zonefile;
+
         text.push_str("/end\n");
 
         self.signed_message_builder.sign(&text)
