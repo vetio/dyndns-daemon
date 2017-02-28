@@ -3,7 +3,9 @@ use errors::*;
 use std::sync::Arc;
 
 use slog::Logger;
-use iron::{Handler, Request, IronResult, IronError, Response};
+//use iron::{Handler, Request, IronResult, IronError, Response};
+use hyper::{header, server};
+use hyper::status::StatusCode;
 
 use dns::DnsService;
 use config;
@@ -27,33 +29,22 @@ impl<Service: DnsService> HttpHandler<Service> {
         }
     }
 
-    fn generate_auth_error(&self) -> Response {
-        use iron::status;
-        let mut response = Response::with(status::Unauthorized);
-
-        response.headers.set_raw("WWW-Authenticate", vec![b"Basic".to_vec()]);
-
-        response
-    }
-
-    fn authenticate(&self, r: &mut Request) -> Option<Response> {
-        use iron::headers;
-
-        match r.headers.get::<headers::Authorization<headers::Basic>>() {
+    fn authenticate(&self, r: &server::Request) -> bool {
+        match r.headers.get::<header::Authorization<header::Basic>>() {
             Some(ref scheme) => {
                 let password = match scheme.password {
                     Some(ref p) => p,
-                    None => return Some(self.generate_auth_error()),
+                    None => return false,
                 };
 
                 if !compare_secure(&scheme.username, &self.username)
                     || !compare_secure(password, &self.password) {
-                    Some(self.generate_auth_error())
+                    false
                 } else {
-                    None
+                    true
                 }
             },
-            None => Some(self.generate_auth_error()),
+            None => false,
         }
     }
 }
@@ -64,26 +55,34 @@ fn compare_secure(s1: &str, s2: &str) -> bool {
     ct_u8_slice_eq(s1.as_bytes(), s2.as_bytes())
 }
 
-impl<Service> Handler for HttpHandler<Service>
+impl<Service> server::Handler for HttpHandler<Service>
 where Service: DnsService + Send + Sync + 'static {
-    fn handle(&self, r: &mut Request) -> IronResult<Response> {
-        use iron::status;
+    fn handle(&self, req: server::Request, mut res: server::Response) {
 
         let logger = self.logger.new(
             o!(
-                "url" => format!("{}", r.url)
+                "url" => format!("{}", req.uri)
             )
         );
-        debug!(logger, "{}", r.headers);
+        debug!(logger, "{}", req.headers);
 
-        if let Some(error) = self.authenticate(r) {
-            return Ok(error);
+        if !self.authenticate(&req) {
+            {
+                use hyper::status::StatusCode;
+                let status = res.status_mut();
+                *status = StatusCode::Unauthorized;
+            }
+            {
+                let header = res.headers_mut();
+                header.set_raw("WWW-Authenticate", vec![b"Basic".to_vec()]);
+            }
+            return;
         }
 
         use std::str::FromStr;
         use std::net::Ipv4Addr;
 
-        match r.headers.get_raw(&self.addr_header) {
+        match req.headers.get_raw(&self.addr_header) {
             Some(values) => {
                 let result = values.first()
                     .ok_or_else(|| "No values for ip header".into())
@@ -98,30 +97,34 @@ where Service: DnsService + Send + Sync + 'static {
                     .and_then(|ip| self.service.update(&ip));
                 if let Err(e) = result {
                     log_error(&self.logger, &e);
-                    return Err(IronError::new(
-                        e,
-                        status::InternalServerError
-                    ));
+
+                    let status = res.status_mut();
+                    *status = StatusCode::InternalServerError;
+                    return;
                 }
             },
             None => {
-                return Ok(Response::with(status::BadRequest));
+                let status = res.status_mut();
+                *status = StatusCode::BadRequest;
+                return;
             }
         };
 
-        Ok(Response::with(status::Ok))
+        let status = res.status_mut();
+        *status = StatusCode::Ok;
     }
 }
 
 pub fn run_server<Service>(logger: &Logger, service: Service, config: &config::Config) -> Result<()>
     where Service: DnsService + Send + Sync + 'static {
-    use iron::Iron;
+    use hyper::server::Server;
 
     let logger = Arc::new(logger.new(o!("component" => "iron-server")));
     let handler = HttpHandler::new(service, logger, config);
 
-    Iron::new(handler)
-        .http(&config.server_addr)
-        .chain_err(|| "Error during execution of http server")?;
+    Server::http(&config.server_addr)
+        .chain_err(|| "Error starting http server")?
+        .handle(handler)
+        .chain_err(|| "Error during handler execution")?;
     Ok(())
 }

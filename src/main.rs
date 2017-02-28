@@ -21,7 +21,7 @@ extern crate lettre;
 
 extern crate chrono;
 
-extern crate iron;
+extern crate hyper;
 
 extern crate envy;
 
