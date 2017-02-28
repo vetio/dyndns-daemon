@@ -1,6 +1,6 @@
 [root]
 name = "dyndns-daemon"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)",
  "clippy 0.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
