@@ -31,18 +31,14 @@ impl<Service: DnsService> HttpHandler<Service> {
 
     fn authenticate(&self, r: &server::Request) -> bool {
         match r.headers.get::<header::Authorization<header::Basic>>() {
-            Some(ref scheme) => {
+            Some(scheme) => {
                 let password = match scheme.password {
                     Some(ref p) => p,
                     None => return false,
                 };
 
-                if !compare_secure(&scheme.username, &self.username)
-                    || !compare_secure(password, &self.password) {
-                    false
-                } else {
-                    true
-                }
+                compare_secure(&scheme.username, &self.username)
+                    && !compare_secure(password, &self.password)
             },
             None => false,
         }
@@ -56,9 +52,8 @@ fn compare_secure(s1: &str, s2: &str) -> bool {
 }
 
 impl<Service> server::Handler for HttpHandler<Service>
-where Service: DnsService + Send + Sync + 'static {
+    where Service: DnsService + Send + Sync + 'static {
     fn handle(&self, req: server::Request, mut res: server::Response) {
-
         let logger = self.logger.new(
             o!(
                 "url" => format!("{}", req.uri)

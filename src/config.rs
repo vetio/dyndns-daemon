@@ -54,7 +54,7 @@ impl RawConfig {
         file.read_to_string(&mut buffer)
             .chain_err(|| "Error reading template to String")?;
 
-        Ok(Template::from_str(&buffer))
+        Ok(Template::from(&buffer as &str))
     }
 }
 
