@@ -6,8 +6,8 @@ Developed for the FRITZ!Box 7362 SL.
 
 ## Requirements
 
-- gpg
-- openssl (currently required because of the HTTP framework used)
+- gpg (command line tool)
+- openssl (required by the SMTP library)
 
 ## Configuration
 
