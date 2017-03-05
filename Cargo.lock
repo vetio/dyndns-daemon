@@ -3,7 +3,7 @@ name = "dyndns-daemon"
 version = "1.0.0"
 dependencies = [
  "chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.118 (registry+https://github.com/rust-lang/crates.io-index)",
  "consistenttime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "dotenv 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "envy 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -96,16 +96,16 @@ dependencies = [
 
 [[package]]
 name = "clippy"
-version = "0.0.115"
+version = "0.0.118"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cargo_metadata 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy_lints 0.0.115 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy_lints 0.0.118 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "clippy_lints"
-version = "0.0.115"
+version = "0.0.118"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "matches 0.1.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -848,8 +848,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum cfg-if 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "de1e760d7b6535af4241fca8bd8adf68e2e7edacc6b29f5d399050c5e48cf88c"
 "checksum chrono 0.2.25 (registry+https://github.com/rust-lang/crates.io-index)" = "9213f7cd7c27e95c2b57c49f0e69b1ea65b27138da84a170133fd21b07659c00"
 "checksum chrono 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "158b0bd7d75cbb6bf9c25967a48a2e9f77da95876b858eadfabaa99cd069de6e"
-"checksum clippy 0.0.115 (registry+https://github.com/rust-lang/crates.io-index)" = "fee6594f64d96314975b267caade78ee300c58bb979afa42ff3283dd85a288b9"
-"checksum clippy_lints 0.0.115 (registry+https://github.com/rust-lang/crates.io-index)" = "3ab123966fabe63732f8176f50349ff6168f39b5dc688047dfb9d6c7f2dd44d1"
+"checksum clippy 0.0.118 (registry+https://github.com/rust-lang/crates.io-index)" = "6cb0894ce1af2464033706bf9b33e28c4a8fc72df8449fcd60f7a5162a7a9630"
+"checksum clippy_lints 0.0.118 (registry+https://github.com/rust-lang/crates.io-index)" = "67d4bf7c7bb21b11b4d62146bcc8abaaf4e230a6346a21c9e88fa0c3540c71a4"
 "checksum consistenttime 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "6a079bddaa385eab2a88dc5816a378921852ab3af6646748da14681b2facf502"
 "checksum dbghelp-sys 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "97590ba53bcb8ac28279161ca943a924d1fd4a8fb3fa63302591647c4fc5b850"
 "checksum dotenv 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "eea1395d2df3b5344dc577809296d9578303296e8d105c408aa80ed67d598ef1"
