@@ -1,10 +1,10 @@
 #![deny(warnings)]
-#![allow(zero_ptr)] // Necessary for lazy_static
 
 #![cfg_attr(test, feature(plugin))]
 #![cfg_attr(test, plugin(quickcheck_macros))]
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
+#![cfg_attr(feature = "clippy", allow(zero_ptr))] // Necessary for lazy_static
 
 #![recursion_limit = "1024"]
 
