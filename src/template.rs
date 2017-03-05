@@ -135,7 +135,7 @@ mod tests {
             };
         }
 
-        let template = Template::from_str(&template);
+        let template = Template::from(&template as &str);
 
         let result = template.render(&ip.0, now.0)?;
 
