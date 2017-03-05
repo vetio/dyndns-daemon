@@ -3,6 +3,12 @@ name = "dyndns-daemon"
 version = "1.0.0"
 authors = ["Simon Roosen <simon@firepulse.de>"]
 
+publish = false
+
+readme = "README"
+
+license = "MIT"
+
 [profile.release]
 lto = true
 
