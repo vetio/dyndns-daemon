@@ -1,4 +1,5 @@
 #![deny(warnings)]
+#![allow(renamed_and_removed_lints)]
 
 #![cfg_attr(test, feature(plugin))]
 #![cfg_attr(test, plugin(quickcheck_macros))]

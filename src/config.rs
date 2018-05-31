@@ -22,9 +22,9 @@ struct RawConfig {
 
 impl RawConfig {
     fn smtp_addr(&self) -> Result<SocketAddr> {
-        use std::net;
+        use std::net::ToSocketAddrs;
 
-        let mut address = net::lookup_host(&self.smtp_host)
+        let mut address = self.smtp_host.to_socket_addrs()
             .chain_err(
                 || format!(
                     "Error resolving host: {}",

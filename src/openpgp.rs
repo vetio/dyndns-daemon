@@ -48,7 +48,7 @@ impl SignedMessageBuilder for Sha1SignedMessageBuilder {
             .chain_err(|| "Error spawning gpg")?;
 
         {
-            let mut stdin = child.stdin.as_mut()
+            let stdin = child.stdin.as_mut()
                 .ok_or_else(|| "Error retrieving stdin for gpg")?;
             stdin.write_all(text.as_bytes())
                 .chain_err(|| "Error writing text to stdin")?;

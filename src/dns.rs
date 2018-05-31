@@ -29,9 +29,10 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             o!("dns-service" => "hetzner")
         );
 
-        use std::net;
+        use std::net::ToSocketAddrs;
 
-        let mut address = net::lookup_host("smtp.strato.de")
+        let mut address = "smtp.strato.de"
+            .to_socket_addrs()
             .unwrap()
             .next()
             .unwrap();
