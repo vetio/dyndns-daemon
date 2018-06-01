@@ -7,7 +7,6 @@ struct RawConfig {
     from_addr: String,
     to_addr: String,
     smtp_host: String,
-    smtp_port: u16,
     smtp_username: String,
     smtp_password: String,
     pgp_key: String,
@@ -24,7 +23,7 @@ impl RawConfig {
     fn smtp_addr(&self) -> Result<SocketAddr> {
         use std::net::ToSocketAddrs;
 
-        let mut address = self.smtp_host.to_socket_addrs()
+        let address = self.smtp_host.to_socket_addrs()
             .chain_err(
                 || format!(
                     "Error resolving host: {}",
@@ -38,8 +37,6 @@ impl RawConfig {
                     self.smtp_host
                 )
             )?;
-
-        address.set_port(self.smtp_port);
 
         Ok(address)
     }

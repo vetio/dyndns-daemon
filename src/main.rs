@@ -30,7 +30,7 @@ extern crate envy;
 extern crate slog;
 extern crate slog_term;
 
-#[cfg(use_dotenv)]
+#[cfg(feature = "use_dotenv")]
 extern crate dotenv;
 
 extern crate itertools;
@@ -40,7 +40,7 @@ extern crate consistenttime;
 #[cfg(test)]
 extern crate quickcheck;
 
-mod dotenv;
+mod envvars;
 mod errors;
 mod openpgp;
 mod http;
@@ -56,7 +56,7 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
     use config::Config;
     use openpgp::Sha1SignedMessageBuilder;
 
-    dotenv::use_dotenv();
+    envvars::use_dotenv()?;
 
     let config = Config::new()?;
     debug!(root_logger, "config: {:?}", config);

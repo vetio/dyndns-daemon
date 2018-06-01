@@ -38,7 +38,7 @@ impl<Service: DnsService> HttpHandler<Service> {
                 };
 
                 compare_secure(&scheme.username, &self.username)
-                    && !compare_secure(password, &self.password)
+                    && compare_secure(password, &self.password)
             },
             None => false,
         }

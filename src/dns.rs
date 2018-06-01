@@ -29,20 +29,11 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             o!("dns-service" => "hetzner")
         );
 
-        use std::net::ToSocketAddrs;
-
-        let mut address = "smtp.strato.de"
-            .to_socket_addrs()
-            .unwrap()
-            .next()
-            .unwrap();
-        address.set_port(587);
-
         HetznerClient {
             logger: logger,
             to_addr: config.to_addr.clone(),
             from_addr: config.from_addr.clone(),
-            smtp_addr: address,
+            smtp_addr: config.smtp_addr.clone(),
             username: config.smtp_username.clone(),
             password: config.smtp_password.clone(),
             hetzner_user: config.hetzner_user.clone(),
