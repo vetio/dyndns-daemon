@@ -8,6 +8,26 @@ os:
   - linux
 
 before_install:
-  - sudo apt-get -qq update
-  - sudo apt-get install -y libssl-dev
-  - sudo apt-get install -y pkg-config
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install cargo-update || echo "cargo-update already installed"
+  - cargo install cargo-travis || echo "cargo-travis already installed"
+  - cargo install-update -a # update outdated cached binaries
+
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
+      - cmake # also required for cargo-update
+    sources:
+      - kalakris-cmake
+
+script:
+  - |
+      cargo build &&
+      cargo coverage
+after_success: bash <(curl -s https://codecov.io/bash) -s target/kcov
