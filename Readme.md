@@ -17,8 +17,7 @@ dyndns-daemon reads its configuration from the environment. Necessary entries ar
 | --- | --- | --- |
 | FROM_ADDR | "From" address as used in the email to the robot. | String |
 | TO_ADDR | Address of the robot. (robot@robot.first-ns.de) | String |
-| SMTP_HOST | Hostname of the SMTP server | String |
-| SMTP_PORT | Port for the SMTP service | U16 (0-65535) |
+| SMTP_HOST | Hostname of the SMTP server, including port | String |
 | SMTP_USERNAME | Username for the SMTP service | String
 | SMTP_PASSWORD | Password for thr SMTP service | String |
 | PGP_KEY | ID of the GPG Key that will be used for signing the email | String |
@@ -34,8 +33,8 @@ See also the [exmaple .env file](res/config.env).
 
 ## Template
 
-To generate a zonefile for the managed domain, dyndns-daemon uses a template, where `{%SERIAL%}` and `{%IP%}` are 
-replaced by a 64-bit timestamp and the client ip respectively.
+To generate a zonefile for the managed domain, dyndns-daemon uses a template, where `{%SERIAL%}` is replaced by a 64-bit timestamp and `{%IP%}` is 
+replaced by the client ip respectively.
 
 ```
 @ IN SOA ns1.first-ns.de. postmaster.robot.first-ns.de. (
@@ -53,4 +52,4 @@ See also the [example file](res/zonefile.tpl).
 
 ## Notes
 
-- The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creates a prompt..
+- The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creating a prompt..
