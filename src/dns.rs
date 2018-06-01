@@ -1,4 +1,4 @@
-use std::net::{Ipv4Addr, SocketAddr};
+use std::net::Ipv4Addr;
 use slog::Logger;
 
 use errors::*;
@@ -15,7 +15,7 @@ pub struct HetznerClient<S> {
     signed_message_builder: S,
     to_addr: String,
     from_addr: String,
-    smtp_addr: SocketAddr,
+    smtp_host: String,
     username: String,
     password: String,
     hetzner_user: String,
@@ -30,15 +30,15 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
         );
 
         HetznerClient {
-            logger: logger,
+            logger,
             to_addr: config.to_addr.clone(),
             from_addr: config.from_addr.clone(),
-            smtp_addr: config.smtp_addr.clone(),
+            smtp_host: config.smtp_host.clone(),
             username: config.smtp_username.clone(),
             password: config.smtp_password.clone(),
             hetzner_user: config.hetzner_user.clone(),
             domain: config.domain.clone(),
-            signed_message_builder: signed_message_builder,
+            signed_message_builder,
             template: config.template.clone(),
         }
     }
@@ -57,7 +57,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             .chain_err(|| "Error building email")?;
 
         let mut transport = SmtpTransportBuilder::new(
-            &self.smtp_addr
+            &self.smtp_host
         )
             .chain_err(|| "Error creating transport builder")?
             .credentials(

@@ -1,4 +1,3 @@
-use std::net::SocketAddr;
 use errors::*;
 use template::Template;
 
@@ -20,27 +19,6 @@ struct RawConfig {
 }
 
 impl RawConfig {
-    fn smtp_addr(&self) -> Result<SocketAddr> {
-        use std::net::ToSocketAddrs;
-
-        let address = self.smtp_host.to_socket_addrs()
-            .chain_err(
-                || format!(
-                    "Error resolving host: {}",
-                    self.smtp_host
-                )
-            )?
-            .next()
-            .ok_or_else(
-                || format!(
-                    "No such host: {}",
-                    self.smtp_host
-                )
-            )?;
-
-        Ok(address)
-    }
-
     fn get_template(&self) -> Result<Template> {
         use std::fs;
         use std::io::Read;
@@ -59,7 +37,7 @@ impl RawConfig {
 pub struct Config {
     pub from_addr: String,
     pub to_addr: String,
-    pub smtp_addr: SocketAddr,
+    pub smtp_host: String,
     pub smtp_username: String,
     pub smtp_password: String,
     pub pgp_key: String,
@@ -78,15 +56,13 @@ impl Config {
 
         let raw_config: RawConfig = from_env()
             .chain_err(|| "Failed to load environment config")?;
-        let address = raw_config.smtp_addr()
-            .chain_err(|| "Failed to resolve SMTP addres")?;
         let template = raw_config.get_template()
             .chain_err(|| "Error evaluating template")?;
 
         Ok(Config {
             from_addr: raw_config.from_addr,
             to_addr: raw_config.to_addr,
-            smtp_addr: address,
+            smtp_host: raw_config.smtp_host,
             smtp_username: raw_config.smtp_username,
             smtp_password: raw_config.smtp_password,
             pgp_key: raw_config.pgp_key,
@@ -96,7 +72,7 @@ impl Config {
             http_auth_user: raw_config.http_auth_user,
             http_auth_password: raw_config.http_auth_password,
             ip_header: raw_config.ip_header,
-            template: template,
+            template,
         })
     }
 }
