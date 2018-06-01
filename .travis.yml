@@ -23,6 +23,8 @@ addons:
       - libdw-dev
       - binutils-dev
       - cmake # also required for cargo-update
+      - libssl-dev
+      - pkg-config
     sources:
       - kalakris-cmake
 
