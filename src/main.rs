@@ -56,7 +56,7 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
     envvars::use_dotenv()?;
 
     let config = Config::new()?;
-    debug!(root_logger, "config: {:?}", config);
+    debug!(root_logger, "config: {:#?}", config);
 
     let signed_message_builder = Sha1SignedMessageBuilder::new(&config);
 
@@ -76,7 +76,7 @@ fn main() {
 
     let root_logger = slog::Logger::root(drain, o!("version" => "0.1"));
     info!(root_logger, "Application started");
-    debug!(root_logger, "arguments: {:?}", arguments);
+    debug!(root_logger, "arguments: {:#?}", arguments);
 
     if let Err(ref e) = run(&root_logger) {
         log_error(&root_logger, e);
