@@ -8,9 +8,6 @@
 
 #![recursion_limit = "1024"]
 
-#![feature(slice_patterns)]
-#![feature(lookup_host)]
-
 #[macro_use]
 extern crate error_chain;
 
