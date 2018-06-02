@@ -53,3 +53,7 @@ See also the [example file](res/zonefile.tpl).
 ## Notes
 
 - The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creating a prompt..
+
+## Buildstatus
+
+![Travis CI](https://travis-ci.org/vetio/dyndns-daemon.svg?branch=master "Travis CI")
