@@ -110,35 +110,36 @@ mod tests {
         }
     }
 
-    #[quickcheck]
-    fn segments_append_to_text(ip: Ip, now: Time, segments: Vec<TemplateSegment>) -> Result<bool> {
-        let mut expected = String::new();
-        let mut template = String::new();
+    quickcheck! {
+        fn segments_append_to_text(ip: Ip, now: Time, segments: Vec<TemplateSegment>) -> Result<bool> {
+            let mut expected = String::new();
+            let mut template = String::new();
 
-        for s in &segments {
-            use std::fmt::Write;
-            match s {
-                &TemplateSegment::Serial => {
-                    write!(expected, "{}", now.0)
-                        .chain_err(|| "Error writing time")?;
-                    template += "{%SERIAL%}";
-                },
-                &TemplateSegment::Ip => {
-                    write!(expected, "{}", ip.0)
-                        .chain_err(|| "Error writing ip")?;
-                    template += "{%IP%}";
-                },
-                &TemplateSegment::Static(ref s) => {
-                    expected += s;
-                    template += s;
-                },
-            };
+            for s in &segments {
+                use std::fmt::Write;
+                match s {
+                    &TemplateSegment::Serial => {
+                        write!(expected, "{}", now.0)
+                            .chain_err(|| "Error writing time")?;
+                        template += "{%SERIAL%}";
+                    },
+                    &TemplateSegment::Ip => {
+                        write!(expected, "{}", ip.0)
+                            .chain_err(|| "Error writing ip")?;
+                        template += "{%IP%}";
+                    },
+                    &TemplateSegment::Static(ref s) => {
+                        expected += s;
+                        template += s;
+                    },
+                };
+            }
+
+            let template = Template::from(&template as &str);
+
+            let result = template.render(&ip.0, now.0)?;
+
+            Ok(result == expected)
         }
-
-        let template = Template::from(&template as &str);
-
-        let result = template.render(&ip.0, now.0)?;
-
-        Ok(result == expected)
     }
 }

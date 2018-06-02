@@ -1,7 +1,6 @@
 #![deny(warnings)]
 #![allow(renamed_and_removed_lints)]
-#![cfg_attr(test, feature(plugin))]
-#![cfg_attr(test, plugin(quickcheck_macros))]
+
 #![cfg_attr(feature = "clippy", feature(plugin))]
 #![cfg_attr(feature = "clippy", plugin(clippy))]
 #![recursion_limit = "1024"]
@@ -35,6 +34,7 @@ extern crate itertools;
 extern crate consistenttime;
 
 #[cfg(test)]
+#[macro_use]
 extern crate quickcheck;
 
 mod config;
