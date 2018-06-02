@@ -29,6 +29,7 @@ extern crate envy;
 #[macro_use]
 extern crate slog;
 extern crate slog_term;
+extern crate slog_async;
 
 #[cfg(feature = "use_dotenv")]
 extern crate dotenv;
@@ -76,9 +77,12 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
 }
 
 fn main() {
-    use slog::DrainExt;
+    use slog::Drain;
 
-    let drain = slog_term::streamer().build().fuse();
+    let decorator = slog_term::TermDecorator::new().build();
+    let drain = slog_term::FullFormat::new(decorator).build().fuse();
+    let drain = slog_async::Async::new(drain).build().fuse();
+
     let root_logger = slog::Logger::root(
         drain, o!("version" => "0.1")
     );
