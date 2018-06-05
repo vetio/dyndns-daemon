@@ -85,8 +85,15 @@ fn main() {
 }
 
 #[derive(Debug)]
+enum ConfigSource {
+    Env,
+    Json(::std::path::PathBuf),
+    Yaml(::std::path::PathBuf),
+}
+
+#[derive(Debug)]
 struct Args {
-    config: Option<String>,
+    config: ConfigSource,
 }
 
 fn parse_args() -> Result<Args> {
@@ -102,11 +109,30 @@ fn parse_args() -> Result<Args> {
                 .long("config")
                 .value_name("FILE")
                 .help("Sets the config file. Supports json and yaml.")
-                .takes_value(true),
+                .takes_value(true)
+                .validator_os(|file| {
+                    use std::path::PathBuf;
+                    let path = PathBuf::from(file);
+                    match path.extension() {
+                        Some(ext) if ext == "json" || ext == "yml" => Ok(()),
+                        _ => Err("Unknown config file extension. Only json and yml are supported".into())
+                    }
+                }),
         )
         .get_matches();
 
-    let config = matches.value_of("config").map(ToOwned::to_owned);
+    let config = if let Some(file) = matches.value_of("config") {
+        use std::path::PathBuf;
+        let path = PathBuf::from(file);
+        let extension = path.extension();
+        match extension {
+            Some(ext) if ext == "json" => ConfigSource::Json(path),
+            Some(ext) if ext == "yml" => ConfigSource::Yaml(path),
+            _ => unreachable!(),
+        }
+    } else {
+        ConfigSource::Env
+    };
 
     Ok(Args { config })
 }
