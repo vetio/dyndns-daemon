@@ -9,13 +9,10 @@ readme = "README"
 
 license = "MIT"
 
-include = ["res/zonefile.tpl"]
-
 [profile.release]
 lto = true
 
 [dependencies]
-clap = "2.31.2"
 lettre = "0.6"
 error-chain = "0.11.0"
 chrono = "0.2"
