@@ -3,4 +3,4 @@ target
 out/
 *.iml
 .env
-config.toml
+./config.toml

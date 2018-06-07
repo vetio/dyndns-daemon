@@ -9,7 +9,7 @@ readme = "README"
 
 license = "MIT"
 
-include = ["res/zonefile.tpl"]
+include = ["res/zonefile.tpl", "res/config.toml"]
 
 [profile.release]
 lto = true
