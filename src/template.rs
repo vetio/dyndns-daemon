@@ -79,14 +79,14 @@ mod tests {
     use std::net;
 
     #[derive(Clone, Copy, Debug)]
-    struct Time(chrono::DateTime<chrono::UTC>);
+    struct Time(chrono::DateTime<chrono::Utc>);
 
     impl quickcheck::Arbitrary for Time {
         fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
             let seconds: i32 = g.gen();
             let time = chrono::NaiveDateTime::from_timestamp(seconds as i64, 0);
 
-            Time(chrono::DateTime::from_utc(time, chrono::UTC))
+            Time(chrono::DateTime::from_utc(time, chrono::Utc))
         }
     }
 
