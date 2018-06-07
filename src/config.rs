@@ -1,6 +1,9 @@
 use errors::*;
 use template::Template;
 
+static IP_RESOLV_METHOD_DYNDNS2: &str = "DynDns2";
+static IP_RESOLV_METHOD_HEADER: &str = "Header";
+
 #[derive(Deserialize, Debug)]
 struct RawConfig {
     from_addr: String,
@@ -14,7 +17,8 @@ struct RawConfig {
     server_addr: String,
     http_auth_user: String,
     http_auth_password: String,
-    ip_header: String,
+    ip_resolv_method: String,
+    ip_header: Option<String>,
     template: String,
 }
 
@@ -31,6 +35,23 @@ impl RawConfig {
 
         Ok(Template::from(&buffer as &str))
     }
+
+    fn get_ip_resolv(&self) -> Result<IpResolvMethod> {
+        match self.ip_resolv_method {
+            ref m if m == IP_RESOLV_METHOD_DYNDNS2 => Ok(IpResolvMethod::DynDns2),
+            ref m if m == IP_RESOLV_METHOD_HEADER => match &self.ip_header {
+                Some(header_name) =>  Ok(IpResolvMethod::Header(header_name.clone())),
+                None => Err("IP_HEADER not set.".into()),
+            },
+            _ => Err(format!("Unknown IP_RESOLV variant. Supported: {}, {}", IP_RESOLV_METHOD_DYNDNS2, IP_RESOLV_METHOD_HEADER).into()),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum IpResolvMethod {
+    Header(String),
+    DynDns2,
 }
 
 #[derive(Debug)]
@@ -46,7 +67,7 @@ pub struct Config {
     pub server_addr: String,
     pub http_auth_user: String,
     pub http_auth_password: String,
-    pub ip_header: String,
+    pub ip_resolv: IpResolvMethod,
     pub template: Template,
 }
 
@@ -58,6 +79,8 @@ impl Config {
             .chain_err(|| "Failed to load environment config")?;
         let template = raw_config.get_template()
             .chain_err(|| "Error evaluating template")?;
+        let ip_resolv = raw_config.get_ip_resolv()
+            .chain_err(|| "Error parsing ip resolution")?;
 
         Ok(Config {
             from_addr: raw_config.from_addr,
@@ -71,7 +94,7 @@ impl Config {
             server_addr: raw_config.server_addr,
             http_auth_user: raw_config.http_auth_user,
             http_auth_password: raw_config.http_auth_password,
-            ip_header: raw_config.ip_header,
+            ip_resolv,
             template,
         })
     }
