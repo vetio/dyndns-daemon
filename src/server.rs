@@ -54,7 +54,7 @@ where
     use std::net::Ipv4Addr;
     use std::str::FromStr;
 
-    let ip = match resolv_ip_from_request(&config.ip_resolv, &req) {
+    let ip = match resolv_ip_from_request(config, &req) {
         Some(ip) => ip,
         None => {
             return Response::builder()
@@ -87,16 +87,21 @@ fn find_in_query<'a, 'b>(query: &'a str, name: &'b str) -> Option<Cow<'a, str>> 
 }
 
 fn resolv_ip_from_request<R>(
-    method: &config::IpResolvMethod,
+    c: &config::Config,
     req: &Request<R>,
 ) -> Option<Result<String>> {
-    match method {
+    match &c.ip_resolv {
         config::IpResolvMethod::DynDns2 => {
             static DOMAIN_HEADER: &str = "domain";
             static IP_HEADER: &str = "myip";
 
             let query = req.uri().query()?;
             let domain = find_in_query(query, DOMAIN_HEADER)?;
+
+            if domain != c.domain {
+                return None;
+            }
+
             let ip = find_in_query(query, IP_HEADER)?;
             Some(Ok(ip.to_string()))
         }
