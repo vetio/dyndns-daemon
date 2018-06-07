@@ -15,21 +15,24 @@ include = ["res/zonefile.tpl"]
 lto = true
 
 [dependencies]
+base64 = "0.9.2"
 clap = "2.31.2"
 lettre = "0.6"
 error-chain = "0.11.0"
-chrono = "0.2"
-hyper = "0.10.4"
+chrono = "0.4.2"
+hyper = "0.12.1"
+http = "0.1.5"
 envy = "0.3.2"
-dotenv = { version = "0.8.0", optional = true }
+dotenv = { version = "0.13.0", optional = true }
 serde = "1.0"
 serde_derive = "1.0"
 slog = { version = "2.2.3", features = ["max_level_trace", "release_max_level_info"] }
 slog-async = "2.3.0"
 slog-term = "2.4.0"
 clippy = { version = "*", optional = true }
-itertools = "0.5.9"
+itertools = "0.7.8"
 consistenttime = "0.2.0"
+url = "1.7.0"
 
 [dev-dependencies]
 quickcheck = "0.6.2"
