@@ -1,7 +1,7 @@
 use errors::*;
 
 #[cfg(feature = "use_dotenv")]
-pub fn use_dotenv() -> Result<()>{
+pub fn use_dotenv() -> Result<()> {
     use dotenv;
 
     if let Err(ref e) = dotenv::dotenv() {
@@ -11,6 +11,6 @@ pub fn use_dotenv() -> Result<()>{
 }
 
 #[cfg(not(feature = "use_dotenv"))]
-pub fn use_dotenv() -> Result<()>{
+pub fn use_dotenv() -> Result<()> {
     Ok(())
 }
