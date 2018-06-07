@@ -1,4 +1,5 @@
 # dyndns-daemon
+[![Build Status](https://travis-ci.org/vetio/dyndns-daemon.svg?branch=master)](https://travis-ci.org/vetio/dyndns-daemon)
 
 Implements a dynamic DNS service for Hetzner's Domain Registration Robot.
 
@@ -29,7 +30,7 @@ dyndns-daemon reads its configuration from the environment. Necessary entries ar
 | IP_HEADER | Name of the header which contains the IP address of the true client. | String |
 | TEMPLATE | File containing a template for the generated zonefile.| String |
 
-See also the [exmaple .env file](res/config.env).
+See also the [exmaple .env file](res/config.toml).
 
 ## Template
 
@@ -53,7 +54,3 @@ See also the [example file](res/zonefile.tpl).
 ## Notes
 
 - The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creating a prompt..
-
-## Buildstatus
-
-![Travis CI](https://travis-ci.org/vetio/dyndns-daemon.svg?branch=master "Travis CI")
