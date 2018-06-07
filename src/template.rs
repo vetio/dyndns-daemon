@@ -17,7 +17,7 @@ pub struct Template {
 }
 
 impl Template {
-    pub fn render(&self, ip: &net::Ipv4Addr, now: DateTime<UTC>) -> Result<String> {
+    pub fn render(&self, ip: &net::Ipv4Addr, now: DateTime<Utc>) -> Result<String> {
         const MAX_IP_SIZE: usize = 15;
         const MAX_SERIAL_SIZE: usize = 19;
 

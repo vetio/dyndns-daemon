@@ -75,7 +75,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
         use chrono::*;
 
-        let now: DateTime<UTC> = UTC::now();
+        let now = Utc::now();
 
         let zonefile = self.template
             .render(addr, now)
