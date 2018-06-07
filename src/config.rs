@@ -1,5 +1,6 @@
 use errors::*;
 use template::Template;
+use std::path::Path;
 
 static IP_RESOLV_METHOD_DYNDNS2: &str = "DynDns2";
 static IP_RESOLV_METHOD_HEADER: &str = "Header";
@@ -23,6 +24,23 @@ struct RawConfig {
 }
 
 impl RawConfig {
+    fn from_env() -> Result<Self> {
+        use envy::from_env;
+        from_env().chain_err(|| "Failed to load environment config")
+    }
+
+    fn from_file<P: AsRef<Path>>(path: P) -> Result<Self> {
+        use toml::de::from_str;
+        use std::io::Read;
+        use std::fs::File;
+
+        let mut config = String::new();
+        let mut file: File = File::open(path).chain_err(|| "Error opening config file")?;
+        file.read_to_string(&mut config).chain_err(|| "Error reading from config file")?;
+
+        from_str(&config).chain_err(|| "Error parsing config file")
+    }
+
     fn get_template(&self) -> Result<Template> {
         use std::fs;
         use std::io::Read;
@@ -74,10 +92,13 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn new() -> Result<Config> {
-        use envy::from_env;
+    pub fn from_source(source: &::ConfigSource) -> Result<Config> {
+        let raw_config = match source {
+            ::ConfigSource::Env => RawConfig::from_env(),
+            ::ConfigSource::File(path) => RawConfig::from_file(path)
+                .chain_err(|| format!("Error reading config from {}", path.to_string_lossy())),
+        }?;
 
-        let raw_config: RawConfig = from_env().chain_err(|| "Failed to load environment config")?;
         let template = raw_config
             .get_template()
             .chain_err(|| "Error evaluating template")?;
