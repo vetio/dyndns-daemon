@@ -33,6 +33,7 @@ clippy = { version = "*", optional = true }
 itertools = "0.7.8"
 consistenttime = "0.2.0"
 url = "1.7.0"
+toml = "0.4.6"
 
 [dev-dependencies]
 quickcheck = "0.6.2"

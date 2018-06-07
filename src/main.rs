@@ -24,6 +24,7 @@ extern crate slog_term;
 extern crate dotenv;
 extern crate itertools;
 extern crate consistenttime;
+extern crate toml;
 
 #[cfg(test)]
 #[macro_use]
@@ -39,7 +40,7 @@ mod template;
 
 use errors::*;
 
-fn run(root_logger: &slog::Logger) -> Result<()> {
+fn run(args: Args, root_logger: &slog::Logger) -> Result<()> {
     use config::Config;
     use dns::HetznerClient;
     use openpgp::Sha1SignedMessageBuilder;
@@ -49,7 +50,7 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
 
     envvars::use_dotenv()?;
 
-    let config = Config::new()?;
+    let config = Config::from_source(&args.config)?;
     debug!(root_logger, "config: {:#?}", config);
 
     let signed_message_builder = Sha1SignedMessageBuilder::new(&config);
@@ -60,7 +61,7 @@ fn run(root_logger: &slog::Logger) -> Result<()> {
 }
 
 fn main() {
-    let arguments = parse_args();
+    let args = parse_args();
 
     use slog::Drain;
 
@@ -68,18 +69,18 @@ fn main() {
     let drain = slog_term::FullFormat::new(decorator).build().fuse();
     let drain = slog_async::Async::new(drain).build().fuse();
 
-    let root_logger = slog::Logger::root(drain, o!("version" => "0.1"));
+    let root_logger = slog::Logger::root(drain, o!("version" => env!("CARGO_PKG_VERSION")));
     info!(root_logger, "Application started");
-    debug!(root_logger, "arguments: {:#?}", arguments);
+    debug!(root_logger, "arguments: {:#?}", args);
 
-    if let Err(ref e) = run(&root_logger) {
+    if let Err(ref e) = run(args, &root_logger) {
         log_error(&root_logger, e);
         std::process::exit(1);
     }
 }
 
 #[derive(Debug)]
-enum ConfigSource {
+pub enum ConfigSource {
     Env,
     File(::std::path::PathBuf),
 }
