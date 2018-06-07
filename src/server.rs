@@ -1,36 +1,10 @@
-use errors::*;
-
-//use std::net::Ipv4Addr;
-use std::sync::Arc;
-
-use slog::Logger;
-//use iron::{Handler, Request, IronResult, IronError, Response};
-//use hyper::StatusCode;
-use hyper::{Request, Response, StatusCode};
-
 use config;
 use dns::DnsService;
+use errors::*;
+use hyper::{Request, Response, StatusCode};
+use slog::Logger;
 use std::borrow::Cow;
-
-struct HttpHandler<Service> {
-    logger: Arc<Logger>,
-    service: Service,
-    username: String,
-    password: String,
-    ip_resolv: config::IpResolvMethod,
-}
-
-impl<Service: DnsService> HttpHandler<Service> {
-    fn new(service: Service, logger: Arc<Logger>, config: &config::Config) -> Self {
-        HttpHandler {
-            logger,
-            service,
-            username: config.http_auth_user.clone(),
-            password: config.http_auth_password.clone(),
-            ip_resolv: config.ip_resolv.clone(),
-        }
-    }
-}
+use std::sync::Arc;
 
 fn authenticate<R>(config: &config::Config, r: &Request<R>) -> bool {
     match r.headers().get(::hyper::header::AUTHORIZATION) {
@@ -40,16 +14,11 @@ fn authenticate<R>(config: &config::Config, r: &Request<R>) -> bool {
                 Err(_) => return false,
             };
             let mut expected = String::from("Basic ");
-            expected += &::base64::encode(&format!("{}:{}", &config.http_auth_user,
-            &config.http_auth_password));
+            expected += &::base64::encode(&format!(
+                "{}:{}",
+                &config.http_auth_user, &config.http_auth_password
+            ));
             compare_secure(&expected, token)
-            //            let password = match scheme.password {
-            //                Some(ref p) => p,
-            //                None => return false,
-            //            };
-            //
-            //            compare_secure(&scheme.username, &config.http_auth_user)
-            //                && compare_secure(password, &config.http_auth_password)
         }
         None => false,
     }
@@ -71,8 +40,8 @@ where
     Service: DnsService,
 {
     let logger = logger.new(o!(
-                "url" => format!("{}", req.uri())
-            ));
+        "url" => format!("{}", req.uri())
+    ));
     debug!(logger, "{:?}", req.headers());
 
     if !authenticate(&config, &req) {
@@ -88,7 +57,9 @@ where
     let ip = match resolv_ip_from_request(&config.ip_resolv, &req) {
         Some(ip) => ip,
         None => {
-            return Response::builder().status(StatusCode::BAD_REQUEST).body("".into());
+            return Response::builder()
+                .status(StatusCode::BAD_REQUEST)
+                .body("".into());
         }
     };
 
@@ -108,7 +79,7 @@ where
 }
 
 fn find_in_query<'a, 'b>(query: &'a str, name: &'b str) -> Option<Cow<'a, str>> {
-    use ::url::form_urlencoded::parse;
+    use url::form_urlencoded::parse;
 
     parse(query.as_bytes())
         .find(|(key, _)| &*key == name)
@@ -128,47 +99,30 @@ fn resolv_ip_from_request<R>(
             let domain = find_in_query(query, DOMAIN_HEADER)?;
             let ip = find_in_query(query, IP_HEADER)?;
             Some(Ok(ip.to_string()))
-//                .map(|s| s.as_bytes())
-//                .map(::url::form_urlencoded::parse)
-//                .and_then(|mut i| i.find(|(key, _)| &*key == param_name))
-//                .map(|(_, val)| Ok(val.to_string()))
-//            let url = format!("{}", req.uri);
-//            let url = match ::url::Url::parse(&url) {
-//                Ok(url) => url,
-//                Err(e) => return Some(Err(e.to_string().into())),
-//            };
-//
-//            match url.query_pairs()
-//                .filter(|&(ref key, _)| key == param_name.as_str())
-//                .next()
-//            {
-//                Some((_, val)) => Some(Ok(val.to_string())),
-//                None => return None,
-//            }
         }
-        config::IpResolvMethod::Header(header_name) =>
-            match req.headers().get(header_name) {
-            Some(value) => {
-                Some(
-                    value
-                        .to_str()
-                        .chain_err(|| "Invalid value for ip header")
-                        .map(String::from)
-                )
-            },
+        config::IpResolvMethod::Header(header_name) => match req.headers().get(header_name) {
+            Some(value) => Some(
+                value
+                    .to_str()
+                    .chain_err(|| "Invalid value for ip header")
+                    .map(String::from),
+            ),
             None => None,
         },
     }
 }
 
-pub fn run_server<Service>(logger: &Logger, service: Service, config: Arc<config::Config>) -> Result<()>
+pub fn run_server<Service>(
+    logger: &Logger,
+    service: Service,
+    config: Arc<config::Config>,
+) -> Result<()>
 where
     Service: DnsService + Send + Sync + 'static,
 {
     use hyper::server::Server;
     let logger = Arc::new(logger.new(o!("component" => "iron-server")));
     let service = Arc::new(service);
-//    let handler = HttpHandler::new(service, logger, config);
     use hyper::rt::Future;
 
     let addr = config
@@ -180,25 +134,13 @@ where
         let logger = logger.clone();
         let config = config.clone();
         let service = service.clone();
-        ::hyper::service::service_fn_ok(
-            move |req: Request<::hyper::Body>| {
-                handle_request(req, &logger.clone(), &config.clone(), &*service).unwrap()
-
-//                return Ok(Response::new(::hyper::Body::from("Hello World")));
-                //        if req.version() == Version::HTTP_11 {
-                //
-                //        } else {
-                //            // Note: it's usually better to return a Response
-                //            // with an appropriate StatusCode instead of an Err.
-                //            Err("not HTTP/1.1, abort connection")
-                //        }
-            },
-        )
+        ::hyper::service::service_fn_ok(move |req: Request<::hyper::Body>| {
+            handle_request(req, &logger.clone(), &config.clone(), &*service).unwrap()
+        })
     };
 
     let server = Server::bind(&addr).serve(new_service);
 
-    // Finally, spawn `server` onto an Executor...
     ::hyper::rt::run(server.map_err(|e| {
         eprintln!("server error: {}", e);
     }));

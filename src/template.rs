@@ -37,10 +37,12 @@ impl Template {
             use std::fmt::Write;
 
             match *segment {
-                TemplateSegment::Ip => write!(buffer, "{}", ip)
-                    .chain_err(|| "Error formatting ip address")?,
-                TemplateSegment::Serial => write!(buffer, "{}", now)
-                    .chain_err(|| "Error formatting serial")?,
+                TemplateSegment::Ip => {
+                    write!(buffer, "{}", ip).chain_err(|| "Error formatting ip address")?
+                }
+                TemplateSegment::Serial => {
+                    write!(buffer, "{}", now).chain_err(|| "Error formatting serial")?
+                }
                 TemplateSegment::Static(ref s) => buffer += s,
             };
         }
@@ -55,20 +57,17 @@ impl<'a> From<&'a str> for Template {
 
         let segments = template
             .split("{%SERIAL%}")
-            .map(
-                |part| part
-                    .split("{%IP%}")
+            .map(|part| {
+                part.split("{%IP%}")
                     .map(|part| TemplateSegment::Static(String::from(part)))
                     .intersperse(TemplateSegment::Ip)
                     .collect()
-            )
+            })
             .intersperse(vec![TemplateSegment::Serial])
             .flat_map(|s| s)
             .collect();
 
-        Template {
-            segments: segments,
-        }
+        Template { segments: segments }
     }
 }
 
@@ -102,7 +101,11 @@ mod tests {
 
     impl quickcheck::Arbitrary for TemplateSegment {
         fn arbitrary<G: quickcheck::Gen>(g: &mut G) -> Self {
-            match g.choose(&[TemplateSegment::Serial, TemplateSegment::Ip, TemplateSegment::Static("".into())]) {
+            match g.choose(&[
+                TemplateSegment::Serial,
+                TemplateSegment::Ip,
+                TemplateSegment::Static("".into()),
+            ]) {
                 Some(s @ &TemplateSegment::Ip) | Some(s @ &TemplateSegment::Serial) => s.clone(),
                 Some(&TemplateSegment::Static(_)) => TemplateSegment::Static(String::arbitrary(g)),
                 None => unreachable!(),

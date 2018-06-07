@@ -1,9 +1,9 @@
-use std::net::Ipv4Addr;
 use slog::Logger;
+use std::net::Ipv4Addr;
 
+use config::Config;
 use errors::*;
 use openpgp::SignedMessageBuilder;
-use config::Config;
 use template::Template;
 
 pub trait DnsService {
@@ -25,9 +25,7 @@ pub struct HetznerClient<S> {
 
 impl<S: SignedMessageBuilder> HetznerClient<S> {
     pub fn new(parent_logger: &Logger, config: &Config, signed_message_builder: S) -> Self {
-        let logger = parent_logger.new(
-            o!("dns-service" => "hetzner")
-        );
+        let logger = parent_logger.new(o!("dns-service" => "hetzner"));
 
         HetznerClient {
             logger,
@@ -56,19 +54,13 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             .build()
             .chain_err(|| "Error building email")?;
 
-        let mut transport = SmtpTransportBuilder::new(
-            &self.smtp_host
-        )
+        let mut transport = SmtpTransportBuilder::new(&self.smtp_host)
             .chain_err(|| "Error creating transport builder")?
-            .credentials(
-                self.username.as_ref(),
-                self.password.as_ref()
-            )
+            .credentials(self.username.as_ref(), self.password.as_ref())
             .connection_reuse(true)
             .build();
 
-        transport.send(email)
-            .chain_err(|| "Error sending mail")?;
+        transport.send(email).chain_err(|| "Error sending mail")?;
         Ok(())
     }
 
@@ -85,13 +77,15 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
         let now: DateTime<UTC> = UTC::now();
 
-        let zonefile = self.template.render(addr, now)
+        let zonefile = self.template
+            .render(addr, now)
             .chain_err(|| "Error rendering zonefile")?;
         text += &zonefile;
 
         text.push_str("/end\n");
 
-        self.signed_message_builder.sign(&text)
+        self.signed_message_builder
+            .sign(&text)
             .chain_err(|| "Error signing email")
     }
 }
@@ -108,4 +102,3 @@ impl<S: SignedMessageBuilder> DnsService for HetznerClient<S> {
         Ok(())
     }
 }
-

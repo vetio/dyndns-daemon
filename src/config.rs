@@ -27,8 +27,7 @@ impl RawConfig {
         use std::fs;
         use std::io::Read;
 
-        let mut file = fs::File::open(&self.template)
-            .chain_err(|| "Error opening template")?;
+        let mut file = fs::File::open(&self.template).chain_err(|| "Error opening template")?;
         let mut buffer = String::new();
         file.read_to_string(&mut buffer)
             .chain_err(|| "Error reading template to String")?;
@@ -40,10 +39,13 @@ impl RawConfig {
         match self.ip_resolv_method {
             ref m if m == IP_RESOLV_METHOD_DYNDNS2 => Ok(IpResolvMethod::DynDns2),
             ref m if m == IP_RESOLV_METHOD_HEADER => match &self.ip_header {
-                Some(header_name) =>  Ok(IpResolvMethod::Header(header_name.clone())),
+                Some(header_name) => Ok(IpResolvMethod::Header(header_name.clone())),
                 None => Err("IP_HEADER not set.".into()),
             },
-            _ => Err(format!("Unknown IP_RESOLV variant. Supported: {}, {}", IP_RESOLV_METHOD_DYNDNS2, IP_RESOLV_METHOD_HEADER).into()),
+            _ => Err(format!(
+                "Unknown IP_RESOLV variant. Supported: {}, {}",
+                IP_RESOLV_METHOD_DYNDNS2, IP_RESOLV_METHOD_HEADER
+            ).into()),
         }
     }
 }
@@ -75,11 +77,12 @@ impl Config {
     pub fn new() -> Result<Config> {
         use envy::from_env;
 
-        let raw_config: RawConfig = from_env()
-            .chain_err(|| "Failed to load environment config")?;
-        let template = raw_config.get_template()
+        let raw_config: RawConfig = from_env().chain_err(|| "Failed to load environment config")?;
+        let template = raw_config
+            .get_template()
             .chain_err(|| "Error evaluating template")?;
-        let ip_resolv = raw_config.get_ip_resolv()
+        let ip_resolv = raw_config
+            .get_ip_resolv()
             .chain_err(|| "Error parsing ip resolution")?;
 
         Ok(Config {
