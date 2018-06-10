@@ -46,9 +46,9 @@ where
 
     if !authenticate(&config, &req) {
         return Response::builder()
-            .status(::hyper::StatusCode::UNAUTHORIZED)
+            .status(StatusCode::OK)
             .header(::hyper::header::WWW_AUTHENTICATE, "Basic")
-            .body("".into());
+            .body("badauth".into());
     }
 
     use std::net::Ipv4Addr;
@@ -58,8 +58,8 @@ where
         Some(ip) => ip,
         None => {
             return Response::builder()
-                .status(StatusCode::BAD_REQUEST)
-                .body("".into());
+                .status(StatusCode::OK)
+                .body("badrequest".into());
         }
     };
 
@@ -71,11 +71,11 @@ where
         log_error(&logger, &e);
 
         return Response::builder()
-            .status(StatusCode::INTERNAL_SERVER_ERROR)
-            .body("".into());
+            .status(StatusCode::OK)
+            .body("dnserr".into());
     };
 
-    Response::builder().status(StatusCode::OK).body("".into())
+    Response::builder().status(StatusCode::OK).body("good".into())
 }
 
 fn find_in_query<'a, 'b>(query: &'a str, name: &'b str) -> Option<Cow<'a, str>> {
