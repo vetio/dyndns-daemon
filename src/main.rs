@@ -74,6 +74,7 @@ fn main() {
     debug!(root_logger, "arguments: {:#?}", args);
 
     if let Err(ref e) = run(args, &root_logger) {
+        eprintln!("{:?}", e);
         log_error(&root_logger, e);
         std::process::exit(1);
     }
