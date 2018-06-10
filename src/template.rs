@@ -41,7 +41,7 @@ impl Template {
                     write!(buffer, "{}", ip).chain_err(|| "Error formatting ip address")?
                 }
                 TemplateSegment::Serial => {
-                    write!(buffer, "{}", now).chain_err(|| "Error formatting serial")?
+                    write!(buffer, "{}", now.timestamp()).chain_err(|| "Error formatting serial")?
                 }
                 TemplateSegment::Static(ref s) => buffer += s,
             };
@@ -122,7 +122,7 @@ mod tests {
                 use std::fmt::Write;
                 match s {
                     &TemplateSegment::Serial => {
-                        write!(expected, "{}", now.0)
+                        write!(expected, "{}", now.0.timestamp())
                             .chain_err(|| "Error writing time")?;
                         template += "{%SERIAL%}";
                     },
