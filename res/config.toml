@@ -8,6 +8,7 @@ to_addr = "robot@robot.first-ns.de"
 smtp_host = "smtp.exaple.com:465"
 smtp_username = "user"
 smtp_password = "pass"
+smtp_helo_name = "localhost"
 
 # ID of the PGP key with which the message to hetzner will be signed
 pgp_key = "0000"

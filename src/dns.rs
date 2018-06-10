@@ -21,6 +21,7 @@ pub struct HetznerClient<S> {
     hetzner_user: String,
     domain: String,
     template: Template,
+    helo_name: String,
 }
 
 impl<S: SignedMessageBuilder> HetznerClient<S> {
@@ -38,6 +39,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
             domain: config.domain.clone(),
             signed_message_builder,
             template: config.template.clone(),
+            helo_name: config.smtp_helo_name.clone(),
         }
     }
 
@@ -56,6 +58,7 @@ impl<S: SignedMessageBuilder> HetznerClient<S> {
 
         let mut transport = SmtpTransportBuilder::new(&self.smtp_host)
             .chain_err(|| "Error creating transport builder")?
+            .hello_name(&self.helo_name)
             .credentials(self.username.as_ref(), self.password.as_ref())
             .connection_reuse(true)
             .build();
