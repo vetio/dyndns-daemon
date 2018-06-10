@@ -92,7 +92,7 @@ fn resolv_ip_from_request<R>(
 ) -> Option<Result<String>> {
     match &c.ip_resolv {
         config::IpResolvMethod::DynDns2 => {
-            static DOMAIN_HEADER: &str = "domain";
+            static DOMAIN_HEADER: &str = "hostname";
             static IP_HEADER: &str = "myip";
 
             let query = req.uri().query()?;
