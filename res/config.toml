@@ -1,0 +1,36 @@
+# From address (linked to PGP key)
+from_addr = "mail@example.com"
+
+# Address of the hetzner robot
+to_addr = "robot@robot.first-ns.de"
+
+# SMTP data
+smtp_host = "smtp.exaple.com:465"
+smtp_username = "user"
+smtp_password = "pass"
+smtp_helo_name = "localhost"
+
+# ID of the PGP key with which the message to hetzner will be signed
+pgp_key = "0000"
+
+# Domain which is to be managed
+domain = "example.com"
+
+# Hetzner user
+hetzner_user = "user"
+
+# Server listening address
+server_addr = "0.0.0.0:0"
+
+# HTTP Basic auth
+http_auth_user = "user"
+http_auth_password = "pass"
+
+# Header from which the real ip of the client is to be read
+ip_resolv_method = "Header"
+# ip_resolv_method = "DynDns2"
+## For header resolution
+ip_header = "X-Real-IP"
+
+# Template for zonefile
+template = "res/zonefile.tpl"

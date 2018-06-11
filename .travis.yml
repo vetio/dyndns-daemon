@@ -1,0 +1,38 @@
+language: rust
+cache: cargo
+
+rust:
+  - nightly
+  - beta
+  - stable
+  - 1.26.0
+
+os:
+  - linux
+
+before_install:
+  - export PATH=$HOME/.cargo/bin:$PATH
+  - cargo install cargo-update || echo "cargo-update already installed"
+  - cargo install cargo-travis || echo "cargo-travis already installed"
+  - cargo install-update -a # update outdated cached binaries
+
+sudo: required
+
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev
+      - cmake # also required for cargo-update
+      - libssl-dev
+      - pkg-config
+    sources:
+      - kalakris-cmake
+
+script:
+  - |
+      cargo build &&
+      cargo coverage
+after_success: bash <(curl -s https://codecov.io/bash) -s target/kcov

@@ -1,4 +1,5 @@
 # dyndns-daemon
+[![Build Status](https://travis-ci.org/vetio/dyndns-daemon.svg?branch=master)](https://travis-ci.org/vetio/dyndns-daemon)
 
 Implements a dynamic DNS service for Hetzner's Domain Registration Robot.
 
@@ -6,7 +7,8 @@ Developed for the FRITZ!Box 7362 SL.
 
 ## Requirements
 
-- gpg
+- gpg (command line tool)
+- openssl (required by the SMTP library)
 
 ## Configuration
 
@@ -16,8 +18,7 @@ dyndns-daemon reads its configuration from the environment. Necessary entries ar
 | --- | --- | --- |
 | FROM_ADDR | "From" address as used in the email to the robot. | String |
 | TO_ADDR | Address of the robot. (robot@robot.first-ns.de) | String |
-| SMTP_HOST | Hostname of the SMTP server | String |
-| SMTP_PORT | Port for the SMTP service | U16 (0-65535) |
+| SMTP_HOST | Hostname of the SMTP server, including port | String |
 | SMTP_USERNAME | Username for the SMTP service | String
 | SMTP_PASSWORD | Password for thr SMTP service | String |
 | PGP_KEY | ID of the GPG Key that will be used for signing the email | String |
@@ -29,12 +30,12 @@ dyndns-daemon reads its configuration from the environment. Necessary entries ar
 | IP_HEADER | Name of the header which contains the IP address of the true client. | String |
 | TEMPLATE | File containing a template for the generated zonefile.| String |
 
-See also the [exmaple .env file](res/config.env).
+See also the [exmaple .env file](res/config.toml).
 
 ## Template
 
-To generate a zonefile for the managed domain, dyndns-daemon uses a template, where `{%SERIAL%}` and `{%IP%}` are 
-replaced by a 64-bit timestamp and the client ip respectively.
+To generate a zonefile for the managed domain, dyndns-daemon uses a template, where `{%SERIAL%}` is replaced by a 64-bit timestamp and `{%IP%}` is 
+replaced by the client ip respectively.
 
 ```
 @ IN SOA ns1.first-ns.de. postmaster.robot.first-ns.de. (
@@ -52,4 +53,4 @@ See also the [example file](res/zonefile.tpl).
 
 ## Notes
 
-- The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creates a prompt..
+- The GPG key used for signing the email content must not be protected with a password. This is due to gpg refusing to accept the password as an argument and creating a prompt..
