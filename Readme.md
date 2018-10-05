@@ -27,10 +27,21 @@ dyndns-daemon reads its configuration from the environment. Necessary entries ar
 | SERVER_ADDR | Address on which will be listened for HTTP requests | String |
 | HTTP_AUTH_USER | Username for HTTP authentication for incoming requests. | String |
 | HTTP_AUTH_PASSWORD | Password for HTTP authentication for incoming requests. |  String |
+| IP_RESOLV_METHOD | String |
 | IP_HEADER | Name of the header which contains the IP address of the true client. | String |
 | TEMPLATE | File containing a template for the generated zonefile.| String |
 
 See also the [exmaple .env file](res/config.toml).
+
+## IP Resolve Method
+
+There are two ways of detecting the IP Adress of the client.
+### Header
+If you define IP_RESOLV_METHOD as Header the server will take the IP from the header definied in IP_HEADER.
+
+### DynDns2
+If you define IP_RESOLV_METHOD as DynDns2 the server will work with the specific dyndns function of most homeuse routers.
+In this case the IP_HEADER value will be ignored.
 
 ## Template
 
